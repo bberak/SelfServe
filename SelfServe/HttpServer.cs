@@ -15,12 +15,12 @@ namespace SelfServe
     public class HttpServer
     {
         public const string DEFAULT_PREFIX = "http://+/";
+        public bool IsRunning { get; private set; }
 
-        HttpListener Listener;
-        string StartUpPath;
-        bool IsRunning;
+        private HttpListener Listener;
+        private string StartUpPath;
 
-        public HttpServer(string[] prefixes)
+        public HttpServer(params string[] prefixes)
         {
             if (prefixes == null || prefixes.Length == 0)
             {
@@ -28,7 +28,7 @@ namespace SelfServe
             }
 
             Listener = new HttpListener();
-            StartUpPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            StartUpPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             IsRunning = false;
 
             foreach (string prefix in prefixes)
@@ -38,7 +38,7 @@ namespace SelfServe
         }
 
         public HttpServer()
-            : this(new string[] { DEFAULT_PREFIX })
+            : this(DEFAULT_PREFIX)
         {
         }
 
@@ -61,14 +61,22 @@ namespace SelfServe
 
         public void Stop()
         {
+            Listener.Stop();
             IsRunning = false;
 
             Console.WriteLine("Server has stopped!");
         }
 
-        protected virtual void Process(object o)
+        private void Process(object o)
         {
             var context = o as HttpListenerContext;
+
+            ProcessRequest(context);
+
+        }
+
+        protected virtual void ProcessRequest(HttpListenerContext context)
+        {
             string filename = Path.GetFileName(HttpUtility.UrlDecode(context.Request.RawUrl));
             string path = Path.Combine(StartUpPath, filename);
 
@@ -77,7 +85,7 @@ namespace SelfServe
                 Console.WriteLine(string.Format("Client requested file ({0})... Not found", filename));
 
                 var error = "<!DOCTYPE HTML><html><head></head><body><h1>File Not Found</h1></body></html>";
-                WriteError(context, error);
+                WriteError(context, error, HttpStatusCode.NotFound);
             }
             else
             {
@@ -107,9 +115,9 @@ namespace SelfServe
             WriteFile(context, GetBytes(output), status);
         }
 
-        protected virtual void WriteError(HttpListenerContext context, string error)
+        protected virtual void WriteError(HttpListenerContext context, string error, HttpStatusCode code = HttpStatusCode.InternalServerError)
         {
-            WritePage(context, error, HttpStatusCode.InternalServerError);
+            WritePage(context, error, code);
         }
 
         protected virtual byte[] GetBytes(string str)

@@ -8,7 +8,7 @@ namespace SelfServe
 {
     class Program
     {
-        static HttpServer Server;
+        private static HttpServer Server;
 
         static void Main(string[] args)
         {
@@ -16,12 +16,7 @@ namespace SelfServe
                 string.Format("SelfServe v{0}\n", Assembly.GetExecutingAssembly().GetName().Version)
                 );
 
-            if (args.Length == 0)
-            {
-                args = new string[] { HttpServer.DEFAULT_PREFIX };
-            }
-
-            Server = new HttpServer(args);
+            Server = args.Length > 0 ? new HttpServer(args) : new HttpServer();
 
             Server.Start();
 
