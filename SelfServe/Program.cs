@@ -16,11 +16,12 @@ namespace SelfServe
                 string.Format("SelfServe v{0}\n", Assembly.GetExecutingAssembly().GetName().Version)
                 );
 
-            Server = args.Length > 0 ? new HttpServer(args) : new HttpServer();
+            using (Server = args.Length > 0 ? new HttpServer(args) : new HttpServer())
+            {
+                Server.Start();
 
-            Server.Start();
-
-            Console.ReadLine();
+                Console.ReadLine();
+            }
         }
     }
 }

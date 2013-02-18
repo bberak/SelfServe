@@ -17,9 +17,9 @@ namespace SelfServe.Tests
             return new HttpServer(prefixes);
         }
 
-        protected WebRequest CreateRequest(string domain = "http://localhost/", string file = "", int timeout = 10000)
+        protected WebRequest CreateRequest(string host = "http://localhost/", string path = "", int timeout = 10000)
         {
-            WebRequest request = HttpWebRequest.Create(domain + file);
+            WebRequest request = HttpWebRequest.Create(host + path);
             request.Timeout = timeout;
 
             return request;

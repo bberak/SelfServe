@@ -12,13 +12,13 @@ using System.Web;
 
 namespace SelfServe
 {
-    public class HttpServer
+    public class HttpServer : IDisposable
     {
         public const string DEFAULT_PREFIX = "http://+/";
         public bool IsRunning { get; private set; }
 
-        private HttpListener Listener;
-        private string StartUpPath;
+        private readonly HttpListener Listener;
+        private readonly string StartUpPath;
 
         public HttpServer(params string[] prefixes)
         {
@@ -55,75 +55,142 @@ namespace SelfServe
         {
             while (IsRunning)
             {
-                ThreadPool.QueueUserWorkItem(Process, Listener.GetContext());
+                try
+                {
+                    ThreadPool.QueueUserWorkItem(ProcessObject, Listener.GetContext());
+                }
+                catch (Exception ex) 
+                {
+                    OnException(ex);
+                }
             }
         }
 
-        public void Stop()
-        {
-            Listener.Stop();
-            IsRunning = false;
-
-            Console.WriteLine("Server has stopped!");
-        }
-
-        private void Process(object o)
+        private void ProcessObject(object o)
         {
             var context = o as HttpListenerContext;
 
             ProcessRequest(context);
-
         }
 
         protected virtual void ProcessRequest(HttpListenerContext context)
         {
-            string filename = Path.GetFileName(HttpUtility.UrlDecode(context.Request.RawUrl));
-            string path = Path.Combine(StartUpPath, filename);
+            string path = context.Request.RawUrl.MapPath(StartUpPath);
 
-            if (!File.Exists(path))
+            using (HttpListenerResponse response = context.Response)
             {
-                Console.WriteLine(string.Format("Client requested file ({0})... Not found", filename));
-
-                var error = "<!DOCTYPE HTML><html><head></head><body><h1>File Not Found</h1></body></html>";
-                WriteError(context, error, HttpStatusCode.NotFound);
-            }
-            else
-            {
-                Console.WriteLine(string.Format("Client requested file ({0})... Found", filename));
-
-                var file = File.ReadAllBytes(path);
-                WriteFile(context, file);
+                if (File.Exists(path))
+                {
+                    OnFileFound(response, path);
+                }
+                else if (Directory.Exists(path))
+                {
+                    OnDirectoryFound(response, path);
+                }
+                else
+                {
+                    OnNotFound(response, path);
+                }
             }
         }
 
-        protected virtual void WriteFile(HttpListenerContext context, byte[] file, HttpStatusCode status = HttpStatusCode.OK)
+        protected virtual void OnFileFound(HttpListenerResponse response, string filePath)
         {
-            context.Response.StatusCode = (int)status;
-            context.Response.ContentLength64 = file.Length;
-            using (Stream s = context.Response.OutputStream)
+            Console.WriteLine(string.Format("Client requested file ({0})... Found", filePath));
+
+            var file = File.ReadAllBytes(filePath);
+            WriteBytes(response, file);
+        }
+
+        protected virtual void OnDirectoryFound(HttpListenerResponse response, string currentDirPath)
+        {
+            Console.WriteLine(string.Format("Client requested directory ({0})... Found", currentDirPath));
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("<!DOCTYPE HTML><html><head></head><body><ul>");
+
+            foreach (string subDirPath in Directory.EnumerateDirectories(currentDirPath))
+            {
+                string subDirUrl = subDirPath.ToUrl(StartUpPath);
+                string subDirName = Path.GetFileName(subDirPath);
+                
+                sb.Append(
+                    string.Format("<li><b><a href=\"{0}\">{1}</a></b></li>", 
+                        subDirUrl, 
+                        subDirName)
+                );
+            }
+
+            foreach (string filePath in Directory.EnumerateFiles(currentDirPath))
+            {        
+                string filePathUrl = filePath.ToUrl(StartUpPath);
+                string filenName = Path.GetFileName(filePath);
+
+                sb.Append(
+                    string.Format("<li><a href=\"{0}\">{1}</a></li>",
+                        filePathUrl,
+                        filenName)
+                );
+            }
+
+            sb.Append("</ul></body></html>");
+
+            WriteHtml(response, sb.ToString());
+        }
+
+        protected virtual void OnNotFound(HttpListenerResponse response, string path)
+        {
+            Console.WriteLine(string.Format("Client requested path ({0})... Not found", path));
+
+            var error = "<!DOCTYPE HTML><html><head></head><body><h1>Path Not Found</h1></body></html>";
+            WriteHtml(response, error, HttpStatusCode.NotFound);
+        }
+
+        protected virtual void OnException(Exception ex)
+        {
+
+        }
+
+        protected virtual void WriteBytes(HttpListenerResponse response, byte[] file, HttpStatusCode status = HttpStatusCode.OK)
+        {
+            response.StatusCode = (int)status;
+            response.ContentLength64 = file.Length;
+            using (Stream s = response.OutputStream)
             {
                 s.Write(file, 0, file.Length);
             }
-
-            context.Response.Close();
         }
 
-        protected virtual void WritePage(HttpListenerContext context, string output, HttpStatusCode status = HttpStatusCode.OK)
+        protected virtual void WriteHtml(HttpListenerResponse response, string output, HttpStatusCode status = HttpStatusCode.OK)
         {
-            context.Response.KeepAlive = true;
-            context.Response.ContentType = "text/html; charset=UTF-8";
-            WriteFile(context, GetBytes(output), status);
-        }
-
-        protected virtual void WriteError(HttpListenerContext context, string error, HttpStatusCode code = HttpStatusCode.InternalServerError)
-        {
-            WritePage(context, error, code);
+            response.KeepAlive = true;
+            response.ContentType = "text/html; charset=UTF-8";
+            WriteBytes(response, GetBytes(output), status);
         }
 
         protected virtual byte[] GetBytes(string str)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(str); ;
             return bytes;
+        }
+
+        protected virtual string UrlDecode(string value)
+        {
+            return HttpUtility.UrlDecode(value);
+        }
+
+        protected virtual string UrlEncode(string value)
+        {
+            return HttpUtility.UrlEncode(value);
+        }
+
+        public void Dispose()
+        {
+            IsRunning = false;
+            Listener.Stop();
+            Listener.Close();
+
+            Console.WriteLine("Server has stopped!");
         }
     }
 }

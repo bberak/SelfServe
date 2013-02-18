@@ -12,26 +12,54 @@ namespace SelfServe.Tests
         public void Request_MissingFile_404()
         {
             //-- Arrange
-            HttpServer server = CreateServer();
-            WebRequest request = CreateRequest(file: "Missing-File.txt");
-      
-            try
+            WebRequest request = CreateRequest(path: "Missing-File.txt");
+            using (HttpServer server = CreateServer())
             {
-                //-- Act
-                server.Start();
-                request.GetResponse();
+                try
+                {
+                    //-- Act
+                    server.Start();
+                    request.GetResponse();
+                }
+                catch (WebException wex)
+                {
+                    //-- Assert
+                    HttpWebResponse response = wex.Response as HttpWebResponse;
+                    Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+                }
+                catch
+                {
+                    //-- Assert
+                    Assert.Fail();
+                }
             }
-            catch (WebException wex)
+        }
+
+        [TestMethod]
+        public void Request_MissingDirectory_404()
+        {
+            //-- Arrange
+            WebRequest request = CreateRequest(path: "dirA/dirB/dirC");
+            using (HttpServer server = CreateServer())
             {
-                //-- Assert
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+                try
+                {
+                    //-- Act
+                    server.Start();
+                    request.GetResponse();
+                }
+                catch (WebException wex)
+                {
+                    //-- Assert
+                    HttpWebResponse response = wex.Response as HttpWebResponse;
+                    Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+                }
+                catch
+                {
+                    //-- Assert
+                    Assert.Fail();
+                }
             }
-            catch
-            {
-                //-- Assert
-                Assert.Fail();
-            }    
         }
     }
 }
