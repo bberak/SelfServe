@@ -7,7 +7,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace SelfServe
@@ -15,7 +14,6 @@ namespace SelfServe
     public class HttpServer : IDisposable
     {
         public const string DEFAULT_PREFIX = "http://+/";
-        public bool IsRunning { get; private set; }
 
         private readonly HttpListener Listener;
         private readonly string StartUpPath;
@@ -29,7 +27,6 @@ namespace SelfServe
 
             Listener = new HttpListener();
             StartUpPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            IsRunning = false;
 
             foreach (string prefix in prefixes)
             {
@@ -45,37 +42,42 @@ namespace SelfServe
         public void Start()
         {
             Listener.Start();
-            IsRunning = true;
-            new TaskFactory().StartNew(BeginLoop);
+
+            new Action(ListenerLoop).BeginInvoke(null, null);
 
             Console.WriteLine("OK, server is ready!");
         }
 
-        private void BeginLoop()
+        private void ListenerLoop()
         {
-            while (IsRunning)
+            try
             {
-                try
+                while (Listener.IsListening)
                 {
-                    ThreadPool.QueueUserWorkItem(ProcessObject, Listener.GetContext());
+                    IAsyncResult result = Listener.BeginGetContext(new AsyncCallback(ListenerCallback), Listener);
+                    result.AsyncWaitHandle.WaitOne();
                 }
-                catch (Exception ex) 
-                {
-                    OnException(ex);
-                }
+            }
+            catch (Exception ex)
+            {
+                OnException(ex);
             }
         }
 
-        private void ProcessObject(object o)
+        private void ListenerCallback(IAsyncResult result)
         {
-            var context = o as HttpListenerContext;
+            if (Listener.IsListening)
+            {
+                HttpListener listener = (HttpListener)result.AsyncState;
+                HttpListenerContext context = listener.EndGetContext(result);
 
-            ProcessRequest(context);
+                ProccessContext(context);
+            }
         }
 
-        protected virtual void ProcessRequest(HttpListenerContext context)
+        protected virtual void ProccessContext(HttpListenerContext context)
         {
-            string path = context.Request.RawUrl.MapPath(StartUpPath);
+            string path = context.Request.RawUrl.ToLocalPath(StartUpPath);
 
             using (HttpListenerResponse response = context.Response)
             {
@@ -107,7 +109,7 @@ namespace SelfServe
             Console.WriteLine(string.Format("Client requested directory ({0})... Found", currentDirPath));
 
             StringBuilder sb = new StringBuilder();
-            sb.Append("<!DOCTYPE HTML><html><head></head><body><ul>");
+            sb.Append("<!DOCTYPE HTML><html><head><title>Directory Listing</title></head><body><ul>");
 
             foreach (string subDirPath in Directory.EnumerateDirectories(currentDirPath))
             {
@@ -142,13 +144,13 @@ namespace SelfServe
         {
             Console.WriteLine(string.Format("Client requested path ({0})... Not found", path));
 
-            var error = "<!DOCTYPE HTML><html><head></head><body><h1>Path Not Found</h1></body></html>";
+            var error = "<!DOCTYPE HTML><html><head><title>Path Not Found</title></head><body><h1>Path Not Found</h1></body></html>";
             WriteHtml(response, error, HttpStatusCode.NotFound);
         }
 
         protected virtual void OnException(Exception ex)
         {
-
+            Console.WriteLine(string.Format("Exception has been caught... {0}", ex.Message));
         }
 
         protected virtual void WriteBytes(HttpListenerResponse response, byte[] file, HttpStatusCode status = HttpStatusCode.OK)
@@ -174,19 +176,8 @@ namespace SelfServe
             return bytes;
         }
 
-        protected virtual string UrlDecode(string value)
-        {
-            return HttpUtility.UrlDecode(value);
-        }
-
-        protected virtual string UrlEncode(string value)
-        {
-            return HttpUtility.UrlEncode(value);
-        }
-
         public void Dispose()
         {
-            IsRunning = false;
             Listener.Stop();
             Listener.Close();
 

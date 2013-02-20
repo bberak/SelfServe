@@ -18,7 +18,7 @@ namespace SelfServe
             return HttpUtility.UrlPathEncode(me);
         }
 
-        public static string MapPath(this string rawUrl, string startupPath)
+        public static string ToLocalPath(this string rawUrl, string startupPath)
         {
             return startupPath + rawUrl.UrlDecode().Replace("/", @"\");
         }
