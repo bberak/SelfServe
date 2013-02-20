@@ -165,7 +165,6 @@ namespace SelfServe
 
         protected virtual void WriteHtml(HttpListenerResponse response, string output, HttpStatusCode status = HttpStatusCode.OK)
         {
-            response.KeepAlive = true;
             response.ContentType = "text/html; charset=UTF-8";
             WriteBytes(response, GetBytes(output), status);
         }
