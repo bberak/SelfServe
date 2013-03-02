@@ -8,15 +8,13 @@ namespace SelfServe
 {
     class Program
     {
-        private static HttpServer Server;
-
         static void Main(string[] args)
         {
             Console.WriteLine(
                 string.Format("SelfServe v{0}\n", Assembly.GetExecutingAssembly().GetName().Version)
                 );
 
-            using (Server = args.Length > 0 ? new HttpServer(args) : new HttpServer())
+            using (HttpServer Server = new HttpFileServer(args))
             {
                 Server.Start();
 

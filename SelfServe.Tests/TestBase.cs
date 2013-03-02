@@ -12,9 +12,9 @@ namespace SelfServe.Tests
             return new HttpServer();
         }
 
-        protected HttpServer CreateServer(string[] prefixes)
+        protected HttpFileServer CreateFileServer()
         {
-            return new HttpServer(prefixes);
+            return new HttpFileServer();
         }
 
         protected WebRequest CreateRequest(string host = "http://localhost/", string path = "", int timeout = 10000)
@@ -22,7 +22,7 @@ namespace SelfServe.Tests
             WebRequest request = HttpWebRequest.Create(host + path);
             request.Timeout = timeout;
 
-            return request;
+            return request as WebRequest;
         }
     }
 }
