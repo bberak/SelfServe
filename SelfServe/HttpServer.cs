@@ -13,25 +13,26 @@ namespace SelfServe
 {
     public class HttpServer : IDisposable
     {
-        public const string DEFAULT_PREFIX = "http://+/";
+        public const string WILDCARD_PREFIX = "http://+/";
 
         private readonly HttpListener Listener;
-        protected readonly string StartUpPath;
+        protected readonly string RootPath;
 
-        public HttpServer(params string[] prefixes)
+        public HttpServer(string[] prefixes = null, string rootPath = "")
         {
-            if (prefixes.Length == 0)
+            if (prefixes == null || prefixes.Length == 0)
             {
-                prefixes = new string[] { DEFAULT_PREFIX };
+                prefixes = new string[] { WILDCARD_PREFIX };
+            }
+
+            if (string.IsNullOrEmpty(rootPath))
+            {
+                rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             }
 
             Listener = new HttpListener();
-            StartUpPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            foreach (string prefix in prefixes)
-            {
-                Listener.Prefixes.Add(prefix);
-            } 
+            prefixes.ToList().ForEach(x => Listener.Prefixes.Add(x));
+            RootPath = rootPath;
         }
 
         public void Start()

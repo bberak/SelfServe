@@ -13,14 +13,14 @@ namespace SelfServe
 {
     public class HttpFileServer : HttpServer
     {
-        public HttpFileServer(params string[] prefixes)
-            : base(prefixes) { }
+        public HttpFileServer(string[] prefixes = null, string rootPath = "")
+            : base(prefixes, rootPath) { }
 
         protected override void ProccessContext(HttpListenerContext context)
         {
             HttpListenerResponse response = context.Response;
 
-            string path = context.Request.RawUrl.ToLocalPath(StartUpPath);
+            string path = context.Request.RawUrl.ToLocalPath(RootPath);
 
             if (File.Exists(path))
             {
@@ -53,7 +53,7 @@ namespace SelfServe
 
             foreach (string subDirPath in Directory.EnumerateDirectories(currentDirPath))
             {
-                string subDirUrl = subDirPath.ToUrl(StartUpPath);
+                string subDirUrl = subDirPath.ToUrl(RootPath);
                 string subDirName = Path.GetFileName(subDirPath);
 
                 sb.Append(
@@ -65,7 +65,7 @@ namespace SelfServe
 
             foreach (string filePath in Directory.EnumerateFiles(currentDirPath))
             {
-                string filePathUrl = filePath.ToUrl(StartUpPath);
+                string filePathUrl = filePath.ToUrl(RootPath);
                 string filenName = Path.GetFileName(filePath);
 
                 sb.Append(
