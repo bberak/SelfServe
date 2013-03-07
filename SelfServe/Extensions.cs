@@ -35,13 +35,13 @@ namespace SelfServe
             return fullPath.Replace(rootPath, string.Empty).ToUrl();
         }
 
-        public static void WriteBytes(this HttpListenerResponse response, byte[] file, HttpStatusCode status = HttpStatusCode.OK)
+        public static void WriteBytes(this HttpListenerResponse response, byte[] bytes, HttpStatusCode status = HttpStatusCode.OK)
         {
             response.StatusCode = (int)status;
-            response.ContentLength64 = file.Length;
+            response.ContentLength64 = bytes.Length;
             using (Stream s = response.OutputStream)
             {
-                s.Write(file, 0, file.Length);
+                s.Write(bytes, 0, bytes.Length);
             }
         }
 
