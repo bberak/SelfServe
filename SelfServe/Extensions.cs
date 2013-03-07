@@ -20,9 +20,9 @@ namespace SelfServe
             return HttpUtility.UrlPathEncode(me);
         }
 
-        public static string ToLocalPath(this string rawUrl, string startupPath)
+        public static string ToLocalPath(this string rawUrl, string rootPath)
         {
-            return startupPath + rawUrl.UrlDecode().Replace("/", @"\");
+            return rootPath + rawUrl.UrlDecode().Replace("/", @"\");
         }
 
         public static string ToUrl(this string path)
@@ -30,9 +30,9 @@ namespace SelfServe
             return path.UrlEncode().Replace(@"\", "/");
         }
 
-        public static string ToUrl(this string fullPath, string startUpPath)
+        public static string ToUrl(this string fullPath, string rootPath)
         {
-            return fullPath.Replace(startUpPath, string.Empty).ToUrl();
+            return fullPath.Replace(rootPath, string.Empty).ToUrl();
         }
 
         public static void WriteBytes(this HttpListenerResponse response, byte[] file, HttpStatusCode status = HttpStatusCode.OK)
