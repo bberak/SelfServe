@@ -18,9 +18,10 @@ namespace SelfServe
 
         protected override void ProccessContext(HttpListenerContext context)
         {
+            HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
 
-            string path = context.Request.RawUrl.ToLocalPath(RootPath);
+            string path = request.RawUrl.ToLocalPath(RootPath);
 
             if (File.Exists(path))
             {
@@ -32,7 +33,7 @@ namespace SelfServe
             }
             else
             {
-                OnNotFound(response, path);
+                OnPathNotFound(request, response);
             }
         }
 
@@ -79,9 +80,9 @@ namespace SelfServe
             response.WriteHtml(sb);
         }
 
-        protected virtual void OnNotFound(HttpListenerResponse response, string path)
+        protected virtual void OnPathNotFound(HttpListenerRequest request, HttpListenerResponse response)
         {
-            Console.WriteLine(string.Format("Client requested path ({0})... Not found", path));
+            Console.WriteLine(string.Format("Client requested path ({0})... Not found", request.RawUrl));
 
             var error = "<!DOCTYPE HTML><html><head><title>Path Not Found</title></head><body><h1>Path Not Found</h1></body></html>";
             response.WriteHtml(error, HttpStatusCode.NotFound);
