@@ -77,7 +77,9 @@ namespace SelfServe
             }
 
             sb.Append("</ul></body></html>");
-            response.WriteHtml(sb);
+
+            response.ContentType = "text/html; charset=UTF-8";
+            response.WriteText(sb);
         }
 
         protected virtual void OnPathNotFound(HttpListenerRequest request, HttpListenerResponse response)
@@ -85,7 +87,9 @@ namespace SelfServe
             Console.WriteLine(string.Format("Client requested path ({0})... Not found", request.RawUrl));
 
             var error = "<!DOCTYPE HTML><html><head><title>Path Not Found</title></head><body><h1>Path Not Found</h1></body></html>";
-            response.WriteHtml(error, HttpStatusCode.NotFound);
+
+            response.StatusCode = (int)HttpStatusCode.NotFound;
+            response.WriteText(error);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace SelfServe.Tests
             {
                 server.RequestReceived += (s, e) =>
                 {
-                    e.Response.WriteHtml("You have requested the default page");
+                    e.Response.WriteText("You have requested the default page");
                 };
                 
                 //-- Act

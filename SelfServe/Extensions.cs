@@ -15,7 +15,7 @@ namespace SelfServe
             return HttpUtility.UrlDecode(me);
         }
 
-        public static string UrlEncode(this string me)
+        public static string UrlPathEncode(this string me)
         {
             return HttpUtility.UrlPathEncode(me);
         }
@@ -27,7 +27,7 @@ namespace SelfServe
 
         public static string ToUrl(this string path)
         {
-            return path.UrlEncode().Replace(@"\", "/");
+            return path.UrlPathEncode().Replace(@"\", "/");
         }
 
         public static string ToUrl(this string fullPath, string rootPath)
@@ -35,9 +35,8 @@ namespace SelfServe
             return fullPath.Replace(rootPath, string.Empty).ToUrl();
         }
 
-        public static void WriteBytes(this HttpListenerResponse response, byte[] bytes, HttpStatusCode status = HttpStatusCode.OK)
+        public static void WriteBytes(this HttpListenerResponse response, byte[] bytes)
         {
-            response.StatusCode = (int)status;
             response.ContentLength64 = bytes.Length;
             using (Stream s = response.OutputStream)
             {
@@ -45,15 +44,14 @@ namespace SelfServe
             }
         }
 
-        public static void WriteHtml(this HttpListenerResponse response, string output, HttpStatusCode status = HttpStatusCode.OK)
+        public static void WriteText(this HttpListenerResponse response, string output)
         {
-            response.ContentType = "text/html; charset=UTF-8";
-            WriteBytes(response, ToBytes(output), status);
+            WriteBytes(response, ToBytes(output));
         }
 
-        public static void WriteHtml(this HttpListenerResponse response, StringBuilder sb, HttpStatusCode status = HttpStatusCode.OK)
+        public static void WriteText(this HttpListenerResponse response, StringBuilder sb)
         {
-            WriteHtml(response, sb.ToString(), status);
+            WriteText(response, sb.ToString());
         }
 
         public static byte[] ToBytes(this string str)
