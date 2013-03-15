@@ -27,7 +27,7 @@ namespace SelfServe
 
             if (string.IsNullOrEmpty(rootPath))
             {
-                rootPath = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
+                rootPath = Environment.CurrentDirectory;
             }
 
             Listener = new HttpListener();
