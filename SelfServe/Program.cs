@@ -10,9 +10,12 @@ namespace SelfServe
     {
         static void Main(string[] args)
         {
+            Console.ForegroundColor = ConsoleColor.Magenta;
+
             Console.WriteLine(
                 string.Format("SelfServe v{0}\n", Assembly.GetExecutingAssembly().GetName().Version)
                 );
+            
 
             using (HttpServer Server = new HttpFileServer(args))
             {
