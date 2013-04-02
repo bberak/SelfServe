@@ -25,11 +25,11 @@ namespace SelfServe
 
             if (File.Exists(path))
             {
-                OnFileFound(response, path);
+                OnFileFound(path, response);
             }
             else if (Directory.Exists(path))
             {
-                OnDirectoryFound(response, path);
+                OnDirectoryFound(path, response);
             }
             else
             {
@@ -37,7 +37,7 @@ namespace SelfServe
             }
         }
 
-        protected virtual void OnFileFound(HttpListenerResponse response, string filePath)
+        protected virtual void OnFileFound(string filePath, HttpListenerResponse response)
         {
             Console.WriteLine(string.Format("Client requested file ({0})... Found", filePath));
 
@@ -45,7 +45,7 @@ namespace SelfServe
             response.WriteBytes(file);
         }
 
-        protected virtual void OnDirectoryFound(HttpListenerResponse response, string currentDirPath)
+        protected virtual void OnDirectoryFound(string currentDirPath, HttpListenerResponse response)
         {
             Console.WriteLine(string.Format("Client requested directory ({0})... Found", currentDirPath));
 
@@ -86,7 +86,15 @@ namespace SelfServe
         {
             Console.WriteLine(string.Format("Client requested path ({0})... Not found", request.RawUrl));
 
-            var error = "<!DOCTYPE HTML><html><head><title>Path Not Found</title></head><body><h1>Path Not Found</h1></body></html>";
+            var error = @"<!DOCTYPE HTML>
+                          <html>
+                             <head>
+                                <title>Path Not Found</title>
+                             </head>
+                             <body>
+                                <h1>Path Not Found</h1>
+                             </body>
+                          </html>";
 
             response.StatusCode = (int)HttpStatusCode.NotFound;
             response.WriteText(error);

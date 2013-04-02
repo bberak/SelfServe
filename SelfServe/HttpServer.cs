@@ -14,9 +14,9 @@ namespace SelfServe
     public class HttpServer : IDisposable
     {
         public const string WILDCARD_PREFIX = "http://+/";
-
-        private readonly HttpListener Listener;
+        public event EventHandler<RequestReceivedArgs> RequestReceived;   
         protected readonly string RootPath;
+        private readonly HttpListener Listener;
 
         public HttpServer(string[] prefixes = null, string rootPath = "")
         {
@@ -90,8 +90,6 @@ namespace SelfServe
             Listener.Close();
 
             Console.WriteLine("Server has stopped!");
-        }
-
-        public event EventHandler<RequestReceivedArgs> RequestReceived;
+        }     
     }
 }
