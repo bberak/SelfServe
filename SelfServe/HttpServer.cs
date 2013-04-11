@@ -41,7 +41,7 @@ namespace SelfServe
 
             new Action(ListenerLoop).BeginInvoke(null, null);
 
-            Console.WriteLine("OK, server is ready!");
+            Log("OK, server is ready!");
         }
 
         private void ListenerLoop()
@@ -81,7 +81,12 @@ namespace SelfServe
 
         protected virtual void OnException(Exception ex)
         {
-            Console.WriteLine(string.Format("Exception has been caught... {0}", ex.Message));
+            Log("Exception has been caught... {0}", ex.Message);
+        }
+
+        protected virtual void Log(string message, params object[] args)
+        {
+            Console.WriteLine(string.Format(message, args));
         }
 
         public void Dispose()
@@ -89,7 +94,7 @@ namespace SelfServe
             Listener.Stop();
             Listener.Close();
 
-            Console.WriteLine("Server has stopped!");
+            Log("Server has stopped!");
         }     
     }
 }

@@ -39,7 +39,7 @@ namespace SelfServe
 
         protected virtual void OnFileFound(string filePath, HttpListenerResponse response)
         {
-            Console.WriteLine(string.Format("Client requested file ({0})... Found", filePath));
+            Log("Client requested file ({0})... Found", filePath);
 
             var file = File.ReadAllBytes(filePath);
             response.WriteBytes(file);
@@ -47,7 +47,7 @@ namespace SelfServe
 
         protected virtual void OnDirectoryFound(string currentDirPath, HttpListenerResponse response)
         {
-            Console.WriteLine(string.Format("Client requested directory ({0})... Found", currentDirPath));
+            Log("Client requested directory ({0})... Found", currentDirPath);
 
             StringBuilder sb = new StringBuilder();
             sb.Append("<!DOCTYPE HTML><html><head><title>Directory Listing</title></head><body><ul>");
@@ -84,7 +84,7 @@ namespace SelfServe
 
         protected virtual void OnPathNotFound(HttpListenerRequest request, HttpListenerResponse response)
         {
-            Console.WriteLine(string.Format("Client requested path ({0})... Not found", request.RawUrl));
+            Log("Client requested path ({0})... Not found", request.RawUrl);
 
             var error = @"<!DOCTYPE HTML>
                           <html>
