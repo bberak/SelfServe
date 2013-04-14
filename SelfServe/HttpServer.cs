@@ -35,6 +35,13 @@ namespace SelfServe
             RootPath = rootPath;
         }
 
+        public bool IgnoreWriteExceptions
+        {
+            get { return Listener.IgnoreWriteExceptions; }
+
+            set { Listener.IgnoreWriteExceptions = value; }
+        }
+
         public void Start()
         {
             Listener.Start();
