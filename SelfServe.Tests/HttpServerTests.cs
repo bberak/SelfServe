@@ -9,18 +9,18 @@ namespace SelfServe.Tests
     {
         [TestMethod]
         public void Request_Default_200()
-        {
-            //-- Arrange  
-            WebRequest request = CreateRequest(path: "default");
+        {       
             using (HttpServer server = CreateServer())
             {
+                //-- Arrange       
                 server.RequestReceived += (s, e) =>
                 {
                     e.Response.WriteText("You have requested the default page");
                 };
-                
-                //-- Act
                 server.Start();
+                WebRequest request = CreateRequest(path: "default");      
+                
+                //-- Act 
                 var response = request.GetResponse();
 
                 //-- Assert

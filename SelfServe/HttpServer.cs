@@ -46,17 +46,10 @@ namespace SelfServe
 
         private void ListenerLoop()
         {
-            try
+            while (Listener.IsListening)
             {
-                while (Listener.IsListening)
-                {
-                    IAsyncResult result = Listener.BeginGetContext(new AsyncCallback(ListenerCallback), Listener);
-                    result.AsyncWaitHandle.WaitOne();
-                }
-            }
-            catch (Exception ex)
-            {
-                OnException(ex);
+                IAsyncResult result = Listener.BeginGetContext(new AsyncCallback(ListenerCallback), Listener);
+                result.AsyncWaitHandle.WaitOne();
             }
         }
 
@@ -69,7 +62,14 @@ namespace SelfServe
 
                 using (HttpListenerResponse response = context.Response)
                 {
-                    ProccessContext(context);
+                    try
+                    {
+                        ProccessContext(context);
+                    }
+                    catch (Exception ex)
+                    {
+                        OnException(ex);
+                    }
                 }
             }
         }

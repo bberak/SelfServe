@@ -11,15 +11,16 @@ namespace SelfServe.Tests
     {
         [TestMethod]
         public void Request_MissingFile_404()
-        {
-            //-- Arrange
-            WebRequest request = CreateRequest(path: "Missing-File.txt");
+        {          
             using (HttpServer server = CreateFileServer())
             {
                 try
                 {
-                    //-- Act
+                    //-- Arrange
                     server.Start();
+                    WebRequest request = CreateRequest(path: "Missing-File.txt");             
+
+                    //-- Act          
                     request.GetResponse();
 
                     //-- Assert
@@ -36,15 +37,16 @@ namespace SelfServe.Tests
 
         [TestMethod]
         public void Request_MissingFolder_404()
-        {
-            //-- Arrange
-            WebRequest request = CreateRequest(path: "X/Y/Z");
+        {          
             using (HttpServer server = CreateFileServer())
             {
                 try
                 {
-                    //-- Act
+                    //-- Arrange
                     server.Start();
+                    WebRequest request = CreateRequest(path: "X/Y/Z");          
+
+                    //-- Act           
                     request.GetResponse();
 
                     //-- Assert
@@ -61,16 +63,17 @@ namespace SelfServe.Tests
 
         [TestMethod]
         public void Request_RootFile_200()
-        {
-            //-- Arrange
-            string dllName = Assembly.GetExecutingAssembly().GetName().Name + ".dll";
-            WebRequest request = CreateRequest(path: dllName);
+        {        
             using (HttpServer server = CreateFileServer())
             {
                 try
                 {
-                    //-- Act
+                    //-- Arrange
                     server.Start();
+                    string dllName = Assembly.GetExecutingAssembly().GetName().Name + ".dll";
+                    WebRequest request = CreateRequest(path: dllName);        
+
+                    //-- Act            
                     HttpWebResponse response = request.GetResponse() as HttpWebResponse;
 
                     //-- Assert
@@ -87,15 +90,16 @@ namespace SelfServe.Tests
 
         [TestMethod]
         public void Request_NestedFile_200()
-        {
-            //-- Arrange
-            WebRequest request = CreateRequest(path: "TestFolders/A/C/D/TestFile3.html");
+        { 
             using (HttpServer server = CreateFileServer())
             {
                 try
                 {
-                    //-- Act
+                    //-- Arrange
                     server.Start();
+                    WebRequest request = CreateRequest(path: "TestFolders/A/C/D/TestFile3.html");       
+
+                    //-- Act
                     HttpWebResponse response = request.GetResponse() as HttpWebResponse;
 
                     //-- Assert
@@ -112,15 +116,16 @@ namespace SelfServe.Tests
 
         [TestMethod]
         public void Request_RootFolder_200()
-        {
-            //-- Arrange
-            WebRequest request = CreateRequest(path: "TestFolders");
+        { 
             using (HttpServer server = CreateFileServer())
             {
                 try
                 {
-                    //-- Act
+                    //-- Arrange
                     server.Start();
+                    WebRequest request = CreateRequest(path: "TestFolders");                
+
+                    //-- Act            
                     HttpWebResponse response = request.GetResponse() as HttpWebResponse;
 
                     //-- Assert
@@ -138,14 +143,16 @@ namespace SelfServe.Tests
         [TestMethod]
         public void Request_NestedFolder_200()
         {
-            //-- Arrange
-            WebRequest request = CreateRequest(path: "TestFolders/A/C/D");
+            
             using (HttpServer server = CreateFileServer())
             {
                 try
                 {
-                    //-- Act
+                    //-- Arrange
                     server.Start();
+                    WebRequest request = CreateRequest(path: "TestFolders/A/C/D");             
+
+                    //-- Act                 
                     HttpWebResponse response = request.GetResponse() as HttpWebResponse;
 
                     //-- Assert
