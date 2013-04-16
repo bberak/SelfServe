@@ -38,9 +38,18 @@ namespace SelfServe
         public static void WriteBytes(this HttpListenerResponse response, byte[] bytes)
         {
             response.ContentLength64 = bytes.Length;
+
             using (Stream s = response.OutputStream)
             {
-                s.Write(bytes, 0, bytes.Length);
+                try
+                {
+                    s.Write(bytes, 0, bytes.Length);
+                }
+                catch (HttpListenerException)
+                {
+                    //-- Apparently, these exceptions are to be expected..
+                    //-- See http://stackoverflow.com/questions/4801868/c-sharp-problem-with-httplistener
+                }
             }
         }
 

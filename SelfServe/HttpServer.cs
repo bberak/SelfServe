@@ -35,13 +35,6 @@ namespace SelfServe
             RootPath = rootPath;
         }
 
-        public bool IgnoreWriteExceptions
-        {
-            get { return Listener.IgnoreWriteExceptions; }
-
-            set { Listener.IgnoreWriteExceptions = value; }
-        }
-
         public void Start()
         {
             Listener.Start();
@@ -67,7 +60,7 @@ namespace SelfServe
                 HttpListener listener = (HttpListener)result.AsyncState;
                 HttpListenerContext context = listener.EndGetContext(result);
 
-                using (HttpListenerResponse response = context.Response)
+                using (context.Response)
                 {
                     try
                     {
