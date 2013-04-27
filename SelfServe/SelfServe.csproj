@@ -46,12 +46,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions.cs" />
-    <Compile Include="HttpFileServer.cs" />
-    <Compile Include="HttpServer.cs" />
+    <Compile Include="EventArgs\ExceptionCaughtEventArgs.cs" />
+    <Compile Include="Extensions\Extensions.cs" />
+    <Compile Include="Servers\HttpFileServer.cs" />
+    <Compile Include="Servers\HttpServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestReceivedArgs.cs" />
+    <Compile Include="EventArgs\RequestReceivedArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.manifest">

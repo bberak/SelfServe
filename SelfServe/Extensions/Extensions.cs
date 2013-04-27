@@ -53,6 +53,7 @@ namespace SelfServe
             }
         }
 
+
         public static void WriteText(this HttpListenerResponse response, string output)
         {
             WriteBytes(response, ToBytes(output));

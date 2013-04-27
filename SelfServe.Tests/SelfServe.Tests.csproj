@@ -53,9 +53,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="HttpServerTests.cs" />
-    <Compile Include="TestBase.cs" />
-    <Compile Include="HttpFileServerTests.cs" />
+    <Compile Include="Servers\Extensions.cs" />
+    <Compile Include="Servers\HttpServerTests.cs" />
+    <Compile Include="Servers\TestBase.cs" />
+    <Compile Include="Servers\HttpFileServerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -27,5 +27,17 @@ namespace SelfServe.Tests
                 Assert.AreEqual(response.GetContents(), "You have requested the default page");
             }
         }
+
+        [TestMethod]
+        public void Check_Server_HandlesException()
+        {
+            using (HttpServer server = CreateServer().ThatThrowsException().AndCatchesException("Exception Handled").AndStart())
+            {
+                var request = CreateRequest(path: "default");
+                var response = request.GetResponse();
+
+                Assert.AreEqual("Exception Handled", response.GetContents());
+            }
+        }
     }
 }

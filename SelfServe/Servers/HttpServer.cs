@@ -14,7 +14,8 @@ namespace SelfServe
     public class HttpServer : IDisposable
     {
         public const string WILDCARD_PREFIX = "http://+/";
-        public event EventHandler<RequestReceivedArgs> RequestReceived;   
+        public event EventHandler<RequestReceivedArgs> RequestReceived;
+        public event EventHandler<ExceptionCaughtEventArgs> ExceptionCaught;
         protected readonly string RootPath;
         private readonly HttpListener Listener;
 
@@ -68,7 +69,7 @@ namespace SelfServe
                     }
                     catch (Exception ex)
                     {
-                        OnException(ex);
+                        ProcessException(context, ex);
                     }
                 }
             }
@@ -79,7 +80,14 @@ namespace SelfServe
             RequestReceived.Fire(this, new RequestReceivedArgs(context));
         }
 
-        protected virtual void OnException(Exception ex)
+        protected virtual void ProcessException(HttpListenerContext context, Exception ex)
+        {
+            ExceptionCaught.Fire(this, new ExceptionCaughtEventArgs(context, ex));
+
+            OnException(context.Request, context.Response, ex);
+        }
+
+        protected virtual void OnException(HttpListenerRequest request, HttpListenerResponse response, Exception ex)
         {
             Log("Exception has been caught... {0}", ex.Message);
         }

@@ -42,7 +42,14 @@ namespace SelfServe
             Log("Client requested file ({0})... Found", filePath);
 
             var file = File.ReadAllBytes(filePath);
+
+            response.ContentType = GetContentType(filePath);
             response.WriteBytes(file);
+        }
+
+        protected virtual string GetContentType(string filePath)
+        {
+            return null;
         }
 
         protected virtual void OnDirectoryFound(string currentDirPath, HttpListenerResponse response)
@@ -97,6 +104,7 @@ namespace SelfServe
                           </html>";
 
             response.StatusCode = (int)HttpStatusCode.NotFound;
+            response.ContentType = "text/html; charset=UTF-8";
             response.WriteText(error);
         }
     }
