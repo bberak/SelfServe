@@ -97,7 +97,7 @@ namespace SelfServe
             Console.WriteLine(string.Format(message, args));
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             Listener.Stop();
             Listener.Close();
