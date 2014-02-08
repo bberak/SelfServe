@@ -9,12 +9,12 @@ namespace SelfServe.Tests
     {
         protected HttpServer CreateServer()
         {
-            return new HttpServer();
+            return new HttpServer(new DefaultConfig { });
         }
 
         protected HttpFileServer CreateFileServer()
         {
-            return new HttpFileServer();
+            return new HttpFileServer(new DefaultConfig { });
         }
 
         protected WebRequest CreateRequest(string host = "http://localhost/", string path = "", int timeout = 10000)

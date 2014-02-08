@@ -13,27 +13,16 @@ namespace SelfServe
 {
     public class HttpServer : IDisposable
     {
-        public const string WILDCARD_PREFIX = "http://+/";
         public event EventHandler<RequestReceivedArgs> RequestReceived;
         public event EventHandler<ExceptionCaughtEventArgs> ExceptionCaught;
         protected readonly string RootPath;
         private readonly HttpListener Listener;
 
-        public HttpServer(string[] prefixes = null, string rootPath = "")
+        public HttpServer(HttpServerConfig config)
         {
-            if (prefixes == null || prefixes.Length == 0)
-            {
-                prefixes = new string[] { WILDCARD_PREFIX };
-            }
-
-            if (string.IsNullOrEmpty(rootPath))
-            {
-                rootPath = Environment.CurrentDirectory;
-            }
-
             Listener = new HttpListener();
-            prefixes.ToList().ForEach(x => Listener.Prefixes.Add(x));
-            RootPath = rootPath;
+            config.Bindings.ToList().ForEach(x => Listener.Prefixes.Add(x));
+            RootPath = config.RootPath;
         }
 
         public void Start()

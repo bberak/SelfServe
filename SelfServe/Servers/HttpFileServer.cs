@@ -13,8 +13,8 @@ namespace SelfServe
 {
     public class HttpFileServer : HttpServer
     {
-        public HttpFileServer(string[] prefixes = null, string rootPath = "")
-            : base(prefixes, rootPath) { }
+        public HttpFileServer(HttpServerConfig config)
+            : base(config) { }
 
         protected override void ProccessContext(HttpListenerContext context)
         {

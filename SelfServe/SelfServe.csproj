@@ -46,6 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configs\DefaultConfig.cs" />
+    <Compile Include="Configs\HttpServerConfig.cs" />
     <Compile Include="EventArgs\ExceptionCaughtEventArgs.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Servers\HttpFileServer.cs" />
@@ -53,12 +55,14 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EventArgs\RequestReceivedArgs.cs" />
+    <Compile Include="Utils\Bindings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.manifest">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
