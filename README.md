@@ -16,6 +16,6 @@ Whilst a FileZilla FTP server is trivial to install - I find it overkill for the
 * Compile source code or [download latest binaries](https://www.dropbox.com/s/4g8foxzt5nu38y5/SelfServe.0.2.0.zip)
 * Drop SelfServe.exe into any folder and run
 * Navigate to http://localhost/ using any browser. SelfServe will automatically bind to localhost, 
-but you can override this behaviour by starting SelfServe with a list of bindings from a command line, eg **"SelfServe.exe http://localhost:80/ http://114.72.91.25/"**
-* Alternatively (for those who want to avoid cmd) you can rename the file in the following format **SelfServe.1222.1223.https.exe** in order to bind to https://localhost:1222/ and https://localhost:1223/
+but you can override this behaviour by starting SelfServe with a list of bindings from a command line, eg **C:\Users\You\SelfServe.exe http://localhost:80/ http://114.72.91.25/**
+* Alternatively (for those who want to avoid cmd) you can rename the file in the following format **SelfServe.1222.1223.https.exe** in order to bind to **https://localhost:1222/** and **https://localhost:1223/**
 * Close SelfServe when done
