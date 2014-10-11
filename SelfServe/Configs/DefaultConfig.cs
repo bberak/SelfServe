@@ -8,12 +8,12 @@ namespace SelfServe
     public class DefaultConfig : HttpServerConfig
     {
         public DefaultConfig()
-            : this(Environment.CurrentDirectory)
+            : this(Environment.CurrentDirectory, addFirewallAuthorization: false)
         {
         }
 
-        public DefaultConfig(string rootPath)
-            : base(new[] { "http://+/", "https://+/" }, rootPath)
+        public DefaultConfig(string rootPath, bool addFirewallAuthorization)
+            : base(new[] { "http://+/", "https://+/" }, rootPath, addFirewallAuthorization)
         {
         }
     }

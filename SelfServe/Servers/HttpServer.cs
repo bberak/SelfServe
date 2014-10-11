@@ -17,12 +17,15 @@ namespace SelfServe
         public event EventHandler<ExceptionCaughtEventArgs> ExceptionCaught;
         protected readonly string RootPath;
         private readonly HttpListener Listener;
+        public HttpServerConfig Config { get; private set; }
 
         public HttpServer(HttpServerConfig config)
         {
+            Config = config;
             Listener = new HttpListener();
-            config.Bindings.ToList().ForEach(x => Listener.Prefixes.Add(x));
+            Config.Bindings.ToList().ForEach(x => Listener.Prefixes.Add(x));
             RootPath = config.RootPath;
+            AddFirewallAuthorization();
         }
 
         public void Start()
@@ -64,6 +67,25 @@ namespace SelfServe
             }
         }
 
+        protected void AddFirewallAuthorization()
+        {
+            if (Config.AddFirewallAuthorization)
+            {
+                var currentLocation = System.Reflection.Assembly.GetEntryAssembly().Location;
+
+                if (!FirewallHelper.Instance.HasAuthorization(currentLocation))
+                    FirewallHelper.Instance.GrantAuthorization(currentLocation, AppDomain.CurrentDomain.FriendlyName);
+            }
+        }
+
+        protected void RemoveFirewallAuthorization()
+        {
+            var currentLocation = System.Reflection.Assembly.GetEntryAssembly().Location;
+
+            if (FirewallHelper.Instance.HasAuthorization(currentLocation))
+                FirewallHelper.Instance.RemoveAuthorization(currentLocation);
+        }
+
         protected virtual void ProccessContext(HttpListenerContext context)
         {
             RequestReceived.Fire(this, new RequestReceivedArgs(context));
@@ -83,15 +105,26 @@ namespace SelfServe
 
         protected virtual void Log(string message, params object[] args)
         {
-            Console.WriteLine(string.Format(message, args));
+            Console.WriteLine(message, args);
         }
 
         public virtual void Dispose()
         {
-            Listener.Stop();
-            Listener.Close();
+            try
+            {
+                Listener.Stop();
+                Listener.Close();
 
-            Log("Server has stopped!");
+                Log("Server has stopped!");
+            }
+            catch (Exception ex)
+            {
+                Log("The following issue was encountered when stopping the server: {0}", ex);
+            }
+            finally
+            {
+                RemoveFirewallAuthorization();
+            }
         }     
     }
 }

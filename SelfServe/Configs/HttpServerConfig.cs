@@ -11,11 +11,13 @@ namespace SelfServe
 
         public string RootPath { get; private set; }
 
-        public HttpServerConfig(string[] prefixes, string rootPath)
+        public bool AddFirewallAuthorization { get; private set; }
+
+        public HttpServerConfig(string[] prefixes, string rootPath, bool addFirewallAuthorization)
         {
             Bindings = prefixes;
-
             RootPath = rootPath;
+            AddFirewallAuthorization = addFirewallAuthorization;
         }
     }
 }
